@@ -7,6 +7,7 @@ from gensim.models import KeyedVectors
 from transformers import AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 from src.models.common import ARTIFACTS
 from src.models.neural import Network, vector
+from src.models.quantization import select_quantized_engine
 from src.nlp.normalize import normalize
 
 NAMES = ('baseline', 'neural', 'teacher', 'student', 'student_int8')
@@ -39,6 +40,7 @@ class Predictor:
             path = ARTIFACTS / ('teacher' if name == 'teacher' else 'student')
             self.tokenizer = AutoTokenizer.from_pretrained(path)
             if name == 'student_int8':
+                select_quantized_engine(torch.backends.quantized)
                 self.model = AutoModelForSequenceClassification.from_config(AutoConfig.from_pretrained(path))
                 self.model = torch.quantization.quantize_dynamic(self.model.eval(), {torch.nn.Linear}, dtype=torch.qint8)
                 self.model.load_state_dict(torch.load(ARTIFACTS / 'student_int8.pt', map_location='cpu', weights_only=True))

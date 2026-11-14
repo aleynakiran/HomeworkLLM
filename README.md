@@ -43,6 +43,8 @@ After completing the sequence above, use this single command:
 python -m app.main
 ```
 
+The app and evaluation automatically select the supported CPU quantization engine: `fbgemm` when available, otherwise `qnnpack` (including Apple Silicon). If neither is supported, install a compatible PyTorch build.
+
 Open the local URL printed by Gradio. The app loads all models for comparison and uses the quantized student's prediction and calibrated threshold for the final route. Low-confidence predictions and unmapped intents route to a human. Product correction covers selected single-word products. Model codes are displayed and retained in the text sent to classifiers.
 
 See `docs/architecture.md`, `docs/technique_map.md`, and `notebooks/colab_train.ipynb` for the GPU workflow.

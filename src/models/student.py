@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from src.models.common import ARTIFACTS, labels_from_train, read_split
 from src.models.teacher import TextDataset
+from src.models.quantization import select_quantized_engine
 
 
 def main():
@@ -44,6 +45,7 @@ def main():
     student.cpu().eval().save_pretrained(path)
     tokenizer.save_pretrained(path)
     # Save a state dict; reconstruct the same architecture before loading it.
+    select_quantized_engine(torch.backends.quantized)
     quantized = torch.quantization.quantize_dynamic(student.cpu().eval(), {nn.Linear}, dtype=torch.qint8)
     torch.save(quantized.state_dict(), ARTIFACTS / 'student_int8.pt')
 
