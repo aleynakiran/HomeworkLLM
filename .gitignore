@@ -1,0 +1,6 @@
+artifacts/
+data/processed/*.jsonl
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc

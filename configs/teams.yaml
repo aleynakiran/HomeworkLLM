@@ -1,0 +1,20 @@
+# MASSIVE is a general assistant dataset; these teams group its intent names.
+teams:
+  smart_home: [iot]
+  entertainment: [music, audio, play, recommendation]
+  travel: [transport, navigation]
+  personal_assistant: [calendar, alarm, reminder, lists, email]
+  information: [weather, news, general, qa, cooking, takeaway, datetime]
+  human agent: []
+# These intent names are excluded entirely from training and validation.
+held_out_intents:
+  - alarm_remove
+  - audio_volume_mute
+  - calendar_remove
+  - cooking_recipe
+  - email_sendemail
+  - iot_cleaning
+  - music_dislikeness
+  - news_query
+  - transport_ticket
+  - weather_query
