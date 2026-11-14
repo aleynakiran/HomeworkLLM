@@ -3,7 +3,7 @@ import json
 import os
 import platform
 import time
-from pathlib import Path
+from src.eval.failures import failure_report
 from src.models.common import ARTIFACTS, ROOT, read_split
 from src.models.inference import NAMES, Predictor, load_thresholds
 from src.nlp.edit_distance import correct_products
@@ -32,10 +32,13 @@ def main():
     hardware = {'platform': platform.platform(), 'processor': platform.processor(), 'machine': platform.machine(), 'logical_cpus': os.cpu_count()}
     results = []
     thresholds = load_thresholds()
+    quantized_predictions = None
     for name in NAMES:
         model = Predictor(name)
         texts = [correct_products(normalize(r['text'])) for r in rows]
         predictions = [model.predict(text, thresholds[name])[0] for text in texts]
+        if name == 'student_int8':
+            quantized_predictions = predictions
         correct = sum(p == row['label'] for p, row in zip(predictions, rows))
         oos = [p for p, row in zip(predictions, rows) if row['label'] == 'out_of_scope']
         if not oos:
@@ -53,6 +56,10 @@ def main():
     for r in results:
         lines.append(f"| {r['model']} | {r['accuracy']:.4f} | {r['out_of_scope_recall']:.4f} | {r['model_size_mb']:.2f} | {r['latency_ms']:.2f} |")
     (output / 'results.md').write_text('\n'.join(lines) + '\n')
+    if quantized_predictions is None:
+        raise RuntimeError('Quantized student was not evaluated')
+    (output / 'failure_examples.md').write_text(
+        failure_report(rows, quantized_predictions), encoding='utf-8')
 
 if __name__ == '__main__':
     main()

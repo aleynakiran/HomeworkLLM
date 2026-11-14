@@ -29,7 +29,11 @@ The preparation script uses a fixed seed to split appliance examples by intent i
 
 Calibration chooses a separate confidence threshold for each model from validation predictions. It maximizes the mean of in-scope acceptance and out-of-scope rejection, breaking ties in favor of the lower threshold. This objective measures rejection, not intent accuracy, and the threshold is not a guarantee on new requests. Thresholds are saved in `artifacts/confidence_thresholds.json`. Recalibrate after retraining; the app and evaluation require that file and never silently fall back to a default.
 
-Generated data and model artifacts are ignored by Git. Evaluation uses the same `data/processed/test.jsonl` for all models and writes measured results to `results/results.json` and `results/results.md`. Model size counts weight files (and the neural word vectors), not tokenizer files or runtime memory. Latency includes tokenization and prediction, measured in a warmed-up CPU process; hardware is recorded with the results.
+Generated data and model artifacts are ignored by Git. Evaluation uses the same `data/processed/test.jsonl` for all models and writes measured results to `results/results.json` and `results/results.md`, and up to ten quantized-student mistakes in test-set order to `results/failure_examples.md`. Model size counts weight files (and the neural word vectors), not tokenizer files or runtime memory. Latency includes tokenization and prediction, measured in a warmed-up CPU process; hardware is recorded with the results.
+
+## Download artifacts from Colab
+
+Run the notebook’s final cell to download `homeworkllm_artifacts.zip`. Extract it into the root of your local `HomeworkLLM` checkout, so the extracted `artifacts/` folder sits alongside `README.md` and contains the models and `confidence_thresholds.json`. The archive contains an `artifacts/` folder, so do not extract it inside another `artifacts/` folder. Download the Colab `results/` and `data/processed/` folders separately if you need those files locally.
 
 ## Run the app
 
