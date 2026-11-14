@@ -17,6 +17,10 @@ def test_code():
 def test_distance_and_correction():
     assert distance('kitten', 'sitting') == 3
     assert correct_products('dishwacher broken') == 'dishwasher broken'
+    assert correct_products('yarın') == 'yarın'
+    assert correct_products('bulasik makinsi') == 'bulaşık makinesi'
+    assert correct_products('çamasir makinesi bozuk') == 'çamaşır makinesi bozuk'
+    assert correct_products('bulasik, makinsi') == 'bulasik, makinsi'
 
 
 def test_eliza():
