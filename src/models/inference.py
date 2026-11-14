@@ -1,4 +1,5 @@
 """Load models once and provide a common CPU prediction interface."""
+import json
 import pickle
 import numpy as np
 import torch
@@ -8,9 +9,17 @@ from src.models.common import ARTIFACTS
 from src.models.neural import Network, vector
 from src.nlp.normalize import normalize
 
-# Held-out intent examples are never used for training; reject low-confidence predictions.
-THRESHOLD = 0.5
 NAMES = ('baseline', 'neural', 'teacher', 'student', 'student_int8')
+
+
+def load_thresholds():
+    path = ARTIFACTS / 'confidence_thresholds.json'
+    if not path.exists():
+        raise FileNotFoundError('Run python -m src.eval.calibrate after training all models')
+    thresholds = json.loads(path.read_text(encoding='utf-8'))['thresholds']
+    if set(thresholds) != set(NAMES) or any(not 0 <= value <= 1 for value in thresholds.values()):
+        raise ValueError('Invalid confidence thresholds; rerun calibration')
+    return thresholds
 
 
 class Predictor:
@@ -38,7 +47,7 @@ class Predictor:
             self.model.eval()
             self.labels = [self.model.config.id2label[i] for i in range(self.model.config.num_labels)]
 
-    def predict(self, text):
+    def predict_raw(self, text):
         text = normalize(text)
         with torch.inference_mode():
             if self.name == 'baseline':
@@ -54,4 +63,8 @@ class Predictor:
                 labels = self.labels
         index = int(np.argmax(probabilities))
         confidence = float(probabilities[index])
-        return (str(labels[index]) if confidence >= THRESHOLD else 'out_of_scope', confidence)
+        return str(labels[index]), confidence
+
+    def predict(self, text, threshold):
+        label, confidence = self.predict_raw(text)
+        return (label if confidence >= threshold else 'out_of_scope', confidence)

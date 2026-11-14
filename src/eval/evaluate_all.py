@@ -5,7 +5,7 @@ import platform
 import time
 from pathlib import Path
 from src.models.common import ARTIFACTS, ROOT, read_split
-from src.models.inference import NAMES, Predictor
+from src.models.inference import NAMES, Predictor, load_thresholds
 from src.nlp.edit_distance import correct_products
 from src.nlp.normalize import normalize
 
@@ -31,18 +31,19 @@ def main():
         raise ValueError('The shared test set is empty')
     hardware = {'platform': platform.platform(), 'processor': platform.processor(), 'machine': platform.machine(), 'logical_cpus': os.cpu_count()}
     results = []
+    thresholds = load_thresholds()
     for name in NAMES:
         model = Predictor(name)
         texts = [correct_products(normalize(r['text'])) for r in rows]
-        predictions = [model.predict(text)[0] for text in texts]
+        predictions = [model.predict(text, thresholds[name])[0] for text in texts]
         correct = sum(p == row['label'] for p, row in zip(predictions, rows))
         oos = [p for p, row in zip(predictions, rows) if row['label'] == 'out_of_scope']
         if not oos:
             raise ValueError('Test set has no out-of-scope examples')
-        model.predict(texts[0])  # Warm up before timing.
+        model.predict(texts[0], thresholds[name])  # Warm up before timing.
         start = time.perf_counter()
         for i in range(100):
-            model.predict(texts[i % len(texts)])
+            model.predict(texts[i % len(texts)], thresholds[name])
         latency = (time.perf_counter() - start) * 1000 / 100
         results.append({'model': name, 'accuracy': correct / len(rows), 'out_of_scope_recall': sum(p == 'out_of_scope' for p in oos) / len(oos), 'model_size_mb': artifact_size(name), 'latency_ms': latency})
     output = ROOT / 'results'

@@ -1,12 +1,16 @@
-# MASSIVE is a general assistant dataset; these teams group its intent names.
+# Exact appliance intent names and MASSIVE intent prefixes map to support teams.
 teams:
+  appliance_technical: [appliance_fault, appliance_usage]
+  parts: [spare_parts]
+  service: [service_appointment]
+  customer_care: [warranty_returns]
   smart_home: [iot]
   entertainment: [music, audio, play, recommendation]
   travel: [transport, navigation]
   personal_assistant: [calendar, alarm, reminder, lists, email]
   information: [weather, news, general, qa, cooking, takeaway, datetime]
   human agent: []
-# These intent names are excluded entirely from training and validation.
+# Held-out intents never appear in training; validation and test label them out_of_scope.
 held_out_intents:
   - alarm_remove
   - audio_volume_mute

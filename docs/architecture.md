@@ -12,14 +12,19 @@ flowchart TD
     E -->|no| I[Teacher prediction]
     E -->|no| J[Student prediction]
     E -->|no| K[Quantized student prediction]
+    T[Validation-calibrated thresholds] --> G
+    T --> H
+    T --> I
+    T --> J
+    T --> K
     G --> L[Comparison table]
     H --> L
     I --> L
     J --> L
     K --> L
-    K --> M{Confidence and team mapping}
-    M -->|low confidence or unknown team| N[Human agent]
+    K --> M{Team mapping}
+    M -->|out of scope or unmapped| N[Human agent]
     M -->|mapped intent| O[Support team]
 ```
 
-Preparation excludes held-out intents from train and validation, relabels them in test, and adds appliance messages to test. All evaluation models use that test file and the same confidence rule. Preprocessing in the app precedes model inference; the model code is displayed without being removed from the message.
+The data preparation script combines a fixed-seed, intent-stratified appliance split with the original MASSIVE splits. It excludes held-out MASSIVE intents from training and labels those intents `out_of_scope` in validation and test. Every model learns from the combined training split. After training, calibration selects one threshold per model using validation confidence scores. Evaluation uses these thresholds and the same test file for every model. In the app, the quantized student determines the route. The extracted code is displayed without being removed from the message.
