@@ -1,1 +1,46 @@
-{}
+{
+  "hardware": {
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "machine": "x86_64",
+    "logical_cpus": 2
+  },
+  "test_set": "data/processed/test.jsonl",
+  "results": [
+    {
+      "model": "baseline",
+      "accuracy": 0.5480462854267986,
+      "out_of_scope_recall": 0.8548387096774194,
+      "model_size_mb": 25.279902458190918,
+      "latency_ms": 7.4087794499973825
+    },
+    {
+      "model": "neural",
+      "accuracy": 0.27502934764380343,
+      "out_of_scope_recall": 0.7903225806451613,
+      "model_size_mb": 5.201605796813965,
+      "latency_ms": 0.2176753200001258
+    },
+    {
+      "model": "teacher",
+      "accuracy": 0.7139023981217508,
+      "out_of_scope_recall": 0.7887864823348695,
+      "model_size_mb": 1060.836826324463,
+      "latency_ms": 107.02721100000417
+    },
+    {
+      "model": "student",
+      "accuracy": 0.632902901224216,
+      "out_of_scope_recall": 0.8556067588325653,
+      "model_size_mb": 516.3959617614746,
+      "latency_ms": 59.89104607000627
+    },
+    {
+      "model": "student_int8",
+      "accuracy": 0.639275532450109,
+      "out_of_scope_recall": 0.8164362519201229,
+      "model_size_mb": 393.14385318756104,
+      "latency_ms": 15.45365560999926
+    }
+  ]
+}
